@@ -1,0 +1,47 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>
+        <textarea id="input" placeholder="Leave a review" rows="10" cols="50"></textarea>
+        <br>
+        <button type="button" onclick="searchPython()">Search Attention is All You Need PDF In Python</button>
+        <button type="button" onclick="searchNode()">Sentiment Analysis In Node</button>
+        <div id="sentiment-response"></div>
+        <div id="search-response"></div>
+        <script>
+            const input = document.getElementById('input');
+            const sentiment = document.getElementById('sentiment-response');
+            const search = document.getElementById('search-response');
+            async function searchNode() {
+                sentiment.innerHTML = 'Loading...'
+                const response = await fetch('http://localhost:3000/node-search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: input.value })
+                });
+                const data = await response.json();
+                console.log(data);
+                sentiment.innerHTML = '';
+                data.sentiment.forEach(element => {
+                    sentiment.innerHTML += '{ Label: ' + element.label + ', Score: ' + element.score + ' }<br>';
+                });
+            }
+
+            async function searchPython() {
+                search.innerHTML = 'Loading...'
+                const response = await fetch('http://localhost:3000/python-search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: input.value })
+                });
+                const data = await response.json();
+                console.log(data);
+                search.innerHTML = 'Question: ' + data.question + '<br><br>Answer:<br>' + data.answer;
+            }
+        </script>
+    </body>
+    </html>
