@@ -18,7 +18,7 @@
             const search = document.getElementById('search-response');
             async function searchNode() {
                 sentiment.innerHTML = 'Loading...'
-                const response = await fetch('http://localhost:3000/node-search', {
+                const response = await fetch('https://node-does-sentiment-analysis.onrender.com/node-search', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ text: input.value })
@@ -33,7 +33,7 @@
 
             async function searchPython() {
                 search.innerHTML = 'Loading...'
-                const response = await fetch('http://localhost:3000/python-search', {
+                const response = await fetch('https://node-does-sentiment-analysis.onrender.com/python-search', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ question: input.value })
