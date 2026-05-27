@@ -33,7 +33,15 @@
 
             async function searchPython() {
                 search.innerHTML = 'Loading...'
-                const response = await fetch('https://node-does-sentiment-analysis.onrender.com/python-search', {
+                const response = await fetch(
+                    // I just found out why render deployed my python app
+                    // But did shutdown python server after 20minutes of deactivity
+                    // It happened because I was calling my python URL from my node backend
+                    // And I must call my python server from my frontend not node
+                    // "https://python-rag-semantic-search-pdf.onrender.com/search",
+                    // So this next line is wrong and I am just keeping it to know it doesn't work
+                    'https://node-does-sentiment-analysis.onrender.com/python-search',
+                    {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ question: input.value })
