@@ -20,7 +20,10 @@
 
         <button onclick="searchPython()">
             Ask Question from Uploaded File,
-            Search Attention is All You Need PDF OR URL In Python
+            Search Books
+            OR
+            External URL
+            In Python
         </button>
         <br>
         <button type="button" onclick="searchNode()">Sentiment Analysis In Node</button>
@@ -51,14 +54,31 @@
 
                     const data = await response.json();
                     console.log(data);
-                    sentiment.innerHTML = '';
+                    sentiment.textContent = '';
+
                     data.sentiment.forEach(element => {
-                        sentiment.innerHTML += '{ Label: ' + element.label + ', Score: ' + element.score + ' }<br>';
+                        sentiment.textContent +=
+                            `{ Label: ${element.label}, Score: ${element.score} }\n`;
                     });
                 } catch (err) {
                     console.error(err);
-                    sentiment.innerHTML = err.message;
+                    sentiment.textContent = err.message;
                 }
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            function linkify(text) {
+                const escaped = escapeHtml(text);
+
+                return escaped.replace(
+                    /(https?:\/\/[^\s]+)/g,
+                    '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+                );
             }
 
             async function searchPython() {
@@ -67,6 +87,13 @@
                 formData.append("question", input.value);
                 formData.append("url", url.value);
                 if (file.files[0]) {
+                    const maxSize = 10 * 1024 * 1024;
+
+                    if (file.files[0].size > maxSize) {
+                        search.textContent = 'File too large';
+                        return;
+                    }
+
                     formData.append("file", file.files[0]);
                 }
 
@@ -76,8 +103,6 @@
                     const response = await fetch(
                         // I just found out why render deployed my python app
                         // But did shutdown python server after 20minutes of deactivity
-                        // It happened because I was calling my python URL from my node backend
-                        // And I must call my python server from my frontend not node
                         'https://python-rag-semantic-search-pdf.onrender.com/search',
                         // So this next line is wrong and I am just keeping it to know it doesn't work
                         // 'https://node-does-sentiment-analysis.onrender.com/python-search',
@@ -92,10 +117,22 @@
     
                     const data = await response.json();
                     console.log(data);
-                    search.innerHTML = 'Question: ' + data.question + '<br><br>Answer:<br>' + data.answer;
+                    // if part of data.answer is url wrap that part in <a> tag and if the answer is a list display each item of answer in a new line
+                    if (Array.isArray(data.answer)) {
+                        search.innerHTML =
+                            '<ul>' +
+                                data.answer.map(item => `<li>${escapeHtml(item)}</li>`).join('') +
+                            '</ul>';
+                    } else {
+                        search.innerHTML =
+                            'Question: ' +
+                            data.question +
+                            '<br><br>Answer:<br>' +
+                            linkify(data.answer);
+                    }
                 } catch (err) {
                     console.error(err);
-                    search.innerHTML = err.message;
+                    search.textContent = err.message;
                 }
             }
         </script>
